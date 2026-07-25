@@ -72,7 +72,35 @@ npm run import:sessions -- --source codex --input ~/.codex/sessions/<date>/<sess
 npm run import:sessions -- --source codex --input ~/.codex/sessions/<date>/<session>.jsonl --commit
 ```
 
-For Cursor, Lovable, Replit, Antigravity or another client, export a JSONL file
-with `project`, `title`, `summary` and optional `agent` (`codex`,
-`claude-code`, or `other`) fields and use `--source generic`. This is the safe
-interchange adapter while a native parser is not yet tested for that client.
+### Cursor
+
+Cursor stores chat history locally and supports exporting a chat as Markdown.
+Export the chat in Cursor, then preview the exported `.md` file explicitly:
+
+```bash
+npm run import:sessions -- --source cursor --input ./cursor-chat.md
+```
+
+The parser reads the last `Assistant`, `Cursor`, or `Agent` section. It never
+discovers or opens Cursor's SQLite history database automatically.
+
+### Replit
+
+Replit preserves Agent context in checkpoints, but does not document a stable
+local transcript path. Export the conversation or checkpoint metadata as JSON
+or JSONL, then provide it explicitly:
+
+```bash
+npm run import:sessions -- --source replit --input ./replit-agent-export.json
+```
+
+The parser reads the final assistant message, or falls back to the latest
+checkpoint description. It makes no network requests and never uses Replit
+credentials.
+
+### Lovable and Antigravity
+
+Lovable and Antigravity remain on the generic JSONL/MCP path until they publish
+stable, supported transcript formats. Export a JSONL file with `project`,
+`title`, `summary` and optional `agent` (`codex`, `claude-code`, or `other`)
+fields and use `--source generic`.

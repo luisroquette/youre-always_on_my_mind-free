@@ -55,8 +55,8 @@ flowchart LR
   or hidden without silently deleting history.
 - A pluggable local storage bridge, so you choose your database, folders,
   repositories and project taxonomy.
-- Ready local importers for Claude Code and Codex session files, plus a generic
-  JSONL interchange format for other tools.
+- Ready local importers for Claude Code, Codex, Cursor Markdown exports, and
+  Replit JSON/JSONL exports, plus a generic JSONL interchange format.
 
 ## Privacy
 
@@ -136,11 +136,12 @@ candidate:
 ```bash
 npm run import:sessions -- --source claude-code --input ~/.claude/projects/<project>/<session>.jsonl
 npm run import:sessions -- --source codex --input ~/.codex/sessions/<date>/<session>.jsonl
+npm run import:sessions -- --source cursor --input ./cursor-chat.md
+npm run import:sessions -- --source replit --input ./replit-agent-export.json
 ```
 
 Append `--commit` only after reviewing the dry-run output. See
-[docs/ADAPTERS.md](docs/ADAPTERS.md) for generic JSONL imports and client
-compatibility boundaries.
+[docs/ADAPTERS.md](docs/ADAPTERS.md) for client compatibility boundaries.
 
 ## What this is not
 
