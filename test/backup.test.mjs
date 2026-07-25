@@ -1,0 +1,23 @@
+import assert from "node:assert/strict";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { execFileSync } from "node:child_process";
+
+const directory = await mkdtemp(join(tmpdir(), "always-on-my-mind-backup-"));
+const data = join(directory, "memory.db");
+const feedback = join(directory, "feedback.jsonl");
+const backup = join(directory, "memory.yaomm-backup");
+await writeFile(data, "local-memory-content");
+await writeFile(feedback, "feedback-content\n");
+const environment = { ...process.env, TEST_BACKUP_PASSPHRASE: "local-test-passphrase" };
+const dryRun = JSON.parse(execFileSync("node", ["scripts/backup.mjs", "--output", backup, "--data", data, "--feedback", feedback, "--passphrase-env", "TEST_BACKUP_PASSPHRASE", "--dry-run"], { encoding: "utf8", env: environment }));
+assert.equal(dryRun.encrypted, true);
+assert.equal(dryRun.files.length, 2);
+const created = JSON.parse(execFileSync("node", ["scripts/backup.mjs", "--output", backup, "--data", data, "--feedback", feedback, "--passphrase-env", "TEST_BACKUP_PASSPHRASE"], { encoding: "utf8", env: environment }));
+assert.equal(created.backed_up, true);
+const encrypted = await readFile(backup, "utf8");
+assert.doesNotMatch(encrypted, /local-memory-content|feedback-content/);
+const verified = JSON.parse(execFileSync("node", ["scripts/backup.mjs", "--verify", backup, "--passphrase-env", "TEST_BACKUP_PASSPHRASE"], { encoding: "utf8", env: environment }));
+assert.equal(verified.verified, true);
+process.stdout.write("Encrypted local backup and verification tests passed.\n");

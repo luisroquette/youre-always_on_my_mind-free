@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "youre-always-on-my-mind": {
+      "command": "node",
+      "args": ["/absolute/path/to/youre-always_on_my_mind/src/index.js"]
+    }
+  }
+}

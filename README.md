@@ -55,8 +55,8 @@ flowchart LR
   or hidden without silently deleting history.
 - A pluggable local storage bridge, so you choose your database, folders,
   repositories and project taxonomy.
-- Ready local importers for Claude Code and Codex session files, plus a generic
-  JSONL interchange format for other tools.
+- Ready local importers for Claude Code, Codex, Cursor Markdown exports, and
+  Replit JSON/JSONL exports, plus a generic JSONL interchange format.
 
 ## Privacy
 
@@ -83,6 +83,18 @@ npm run dashboard
 ```
 
 Open `http://127.0.0.1:4317`.
+
+### One-command client setup
+
+After installing dependencies, run the local setup assistant to create a
+project `.mcp.json` without exposing credentials or data paths:
+
+```bash
+npm run setup
+```
+
+Use `npm run setup -- --dry-run` to preview it first. See the copyable client
+examples in [examples/mcp](examples/mcp).
 
 The first run expects a compatible local memory bridge. The default keeps
 compatibility with the Claude-memory bridge used in this project. To use your
@@ -136,11 +148,28 @@ candidate:
 ```bash
 npm run import:sessions -- --source claude-code --input ~/.claude/projects/<project>/<session>.jsonl
 npm run import:sessions -- --source codex --input ~/.codex/sessions/<date>/<session>.jsonl
+npm run import:sessions -- --source cursor --input ./cursor-chat.md
+npm run import:sessions -- --source replit --input ./replit-agent-export.json
 ```
 
 Append `--commit` only after reviewing the dry-run output. See
-[docs/ADAPTERS.md](docs/ADAPTERS.md) for generic JSONL imports and client
-compatibility boundaries.
+[docs/ADAPTERS.md](docs/ADAPTERS.md) for client compatibility boundaries.
+
+## Backup, metrics and examples
+
+Create an encrypted local export with a passphrase that never enters the
+repository or command history:
+
+```bash
+export YOURE_ALWAYS_ON_MY_MIND_BACKUP_PASSPHRASE="use-a-long-unique-passphrase"
+npm run backup -- --output ./memory.yaomm-backup
+npm run backup -- --verify ./memory.yaomm-backup
+```
+
+`npm run adoption` reports public GitHub activity, package downloads when
+available, and the local doctor outcome. It sends no telemetry from this app.
+For practical workflows and screen-capture scripts, see
+[docs/EXAMPLES.md](docs/EXAMPLES.md) and [docs/VIDEOS.md](docs/VIDEOS.md).
 
 ## What this is not
 
@@ -152,7 +181,8 @@ what claude-mem preserves.
 ## Contributing
 
 Adapters, client setup guides and accessibility improvements are especially
-welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
+welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), [ROADMAP.md](ROADMAP.md), and
+[SECURITY.md](SECURITY.md).
 
 ## License
 

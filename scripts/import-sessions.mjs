@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 import { readdir, readFile, stat } from "node:fs/promises";
-import { basename, resolve } from "node:path";
+import { basename, extname, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { config } from "../src/config.mjs";
 
-const SOURCES = new Set(["claude-code", "codex", "generic"]);
+const SOURCES = new Set(["claude-code", "codex", "cursor", "replit", "generic"]);
 const MAX_SUMMARY_LENGTH = 1_400;
 
 function usage() {
-  console.error("Usage: import-sessions --source <claude-code|codex|generic> --input <file-or-directory> [--input <...>] [--project <name>] [--commit] [--limit <n>] [--bridge <path>]");
+  console.error("Usage: import-sessions --source <claude-code|codex|cursor|replit|generic> --input <file-or-directory> [--input <...>] [--project <name>] [--commit] [--limit <n>] [--bridge <path>]");
   process.exit(1);
 }
 
@@ -30,16 +30,23 @@ function argumentsFrom(argv) {
   return result;
 }
 
-async function jsonlFiles(input) {
+function supportedExtensions(source) {
+  if (source === "cursor") return new Set([".md", ".markdown"]);
+  if (source === "replit") return new Set([".json", ".jsonl"]);
+  return new Set([".jsonl"]);
+}
+
+async function sourceFiles(input, source) {
   const path = resolve(input);
   const details = await stat(path);
   if (details.isFile()) return [path];
+  const extensions = supportedExtensions(source);
   const files = [];
   async function walk(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const child = `${directory}/${entry.name}`;
       if (entry.isDirectory()) await walk(child);
-      else if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push(child);
+      else if (entry.isFile() && extensions.has(extname(entry.name).toLowerCase())) files.push(child);
     }
   }
   await walk(path);
@@ -74,6 +81,12 @@ function projectFrom(cwd, fallback) {
 }
 
 function parseRows(content) {
+  const trimmed = content.trim();
+  if (!trimmed) return [];
+  try {
+    const parsed = JSON.parse(trimmed);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch {}
   return content.split("\n").filter(Boolean).flatMap((line) => {
     try { return [JSON.parse(line)]; } catch { return []; }
   });
@@ -98,6 +111,53 @@ function candidateFromCodex(rows, path, projectOverride) {
   return summary ? { project, agent: "codex", title: `Codex session ${session}`, summary, source_file: path } : null;
 }
 
+function frontMatterValue(content, key) {
+  const match = content.match(new RegExp(`^${key}\\s*:\\s*(.+)$`, "im"));
+  return match?.[1]?.trim();
+}
+
+function candidateFromCursor(content, path, projectOverride) {
+  const sections = [...content.matchAll(/^(?:#{1,6}[ \t]*)?(User|You|Assistant|Cursor|Agent)\s*:?[ \t]*$/gim)];
+  const assistantSections = sections.filter((section) => /^(assistant|cursor|agent)$/i.test(section[1]));
+  const last = assistantSections.at(-1);
+  const next = last ? sections.find((section) => section.index > last.index) : null;
+  const summary = sanitize(last ? content.slice(last.index + last[0].length, next?.index).trim() : "");
+  const projectSource = frontMatterValue(content, "project") ?? frontMatterValue(content, "workspace") ?? frontMatterValue(content, "cwd");
+  const project = projectOverride ?? projectFrom(projectSource, "cursor");
+  const session = basename(path, extname(path)).slice(-80);
+  return summary ? { project, agent: "other", title: `Cursor session ${session}`, summary, source_file: path } : null;
+}
+
+function valuesFrom(value) {
+  if (Array.isArray(value)) return value.flatMap(valuesFrom);
+  if (!value || typeof value !== "object") return [];
+  return [value, ...Object.values(value).flatMap(valuesFrom)];
+}
+
+function replitProject(rows, fallback) {
+  const values = valuesFrom(rows);
+  const named = values.find((row) => typeof row.cwd === "string" || typeof row.replSlug === "string" || typeof row.project?.name === "string" || typeof row.repl?.slug === "string");
+  return projectFrom(named?.cwd ?? named?.replSlug ?? named?.project?.name ?? named?.repl?.slug, fallback);
+}
+
+function candidateFromReplit(rows, path, projectOverride) {
+  const values = valuesFrom(rows);
+  const messages = values.filter((row) => /^(assistant|agent)$/i.test(String(row.role ?? row.message?.role ?? row.payload?.role ?? "")));
+  const lastMessage = messages.at(-1);
+  const checkpoints = values.filter((row) => /checkpoint/i.test(String(row.type ?? row.kind ?? "")) && (row.description || row.summary || row.title));
+  const lastCheckpoint = checkpoints.at(-1);
+  const summary = sanitize(
+    textFrom(lastMessage?.content ?? lastMessage?.message?.content ?? lastMessage?.payload?.content)
+    || lastMessage?.text
+    || lastCheckpoint?.description
+    || lastCheckpoint?.summary
+    || lastCheckpoint?.title,
+  );
+  const project = projectOverride ?? replitProject(rows, "replit");
+  const session = String(values.find((row) => row.sessionId || row.conversationId || row.id)?.sessionId ?? values.find((row) => row.conversationId)?.conversationId ?? basename(path, extname(path))).slice(-80);
+  return summary ? { project, agent: "other", title: `Replit session ${session}`, summary, source_file: path } : null;
+}
+
 function candidatesFromGeneric(rows, path, projectOverride) {
   return rows.map((row, index) => {
     const summary = sanitize(row.summary ?? row.content ?? row.text);
@@ -115,9 +175,12 @@ function candidatesFromGeneric(rows, path, projectOverride) {
 }
 
 async function candidatesForFile(source, path, project) {
-  const rows = parseRows(await readFile(path, "utf8"));
+  const content = await readFile(path, "utf8");
+  if (source === "cursor") return [candidateFromCursor(content, path, project)].filter(Boolean);
+  const rows = parseRows(content);
   if (source === "claude-code") return [candidateFromClaude(rows, path, project)].filter(Boolean);
   if (source === "codex") return [candidateFromCodex(rows, path, project)].filter(Boolean);
+  if (source === "replit") return [candidateFromReplit(rows, path, project)].filter(Boolean);
   return candidatesFromGeneric(rows, path, project);
 }
 
@@ -131,7 +194,7 @@ function record(candidate, bridge) {
 }
 
 const options = argumentsFrom(process.argv.slice(2));
-const files = (await Promise.all(options.inputs.map(jsonlFiles))).flat().slice(0, options.limit);
+const files = (await Promise.all(options.inputs.map((input) => sourceFiles(input, options.source)))).flat().slice(0, options.limit);
 const candidates = (await Promise.all(files.map((path) => candidatesForFile(options.source, path, options.project)))).flat().slice(0, options.limit);
 const records = options.commit ? candidates.map((candidate) => ({ ...candidate, result: record(candidate, options.bridge) })) : candidates;
 console.log(JSON.stringify({ source: options.source, mode: options.commit ? "committed" : "dry-run", files_scanned: files.length, candidates: records.length, records }, null, 2));
