@@ -74,8 +74,8 @@ also need a local claude-mem-compatible bridge. If it is not at the default
 path, set `YOURE_ALWAYS_ON_MY_MIND_BRIDGE_PATH` before `npm run doctor`.
 
 ```bash
-git clone https://github.com/luisroquette/youre_always_on_my_mind.git
-cd youre_always_on_my_mind
+git clone https://github.com/luisroquette/youre-always_on_my_mind.git
+cd youre-always_on_my_mind
 npm install
 npm run doctor
 npm test
