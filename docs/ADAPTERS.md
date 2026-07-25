@@ -25,6 +25,39 @@ settings if it offers a stdio connection. A client integration is not a claim
 that the client captures memories automatically; it is the connection that lets
 the client search and record the memories you choose.
 
+## Copyable MCP configurations
+
+Ready-to-copy local configurations live in [examples/mcp](../examples/mcp):
+
+- `claude-code.json` for Claude Code project configuration.
+- `codex.toml` for Codex.
+- `cursor.mcp.json` for Cursor's `.cursor/mcp.json`.
+- `generic-stdio.json` for another compatible stdio client.
+- `replit.md` explains the local-only boundary for Replit.
+
+Replace `/absolute/path/to/...` with the local checkout path. Never add a
+database path, backup passphrase, token, or personal directory to a shared
+configuration.
+
+`npm run setup` writes the compatible `.mcp.json` entry interactively. It
+checks that a local memory bridge exists and preserves unrelated server entries.
+
+## Encrypted local backup
+
+`npm run backup` packages the configured database and feedback log using
+AES-256-GCM with an scrypt-derived key. It requires a passphrase from an
+environment variable, not from a command argument:
+
+```bash
+export YOURE_ALWAYS_ON_MY_MIND_BACKUP_PASSPHRASE="use-a-long-unique-passphrase"
+npm run backup -- --output ./memory.yaomm-backup
+npm run backup -- --verify ./memory.yaomm-backup
+```
+
+Use `--dry-run` to inspect selected file names and sizes. Keep the passphrase
+separate from the encrypted file. Restore is intentionally not implemented yet:
+the roadmap requires a compatibility and recoverability review first.
+
 ## Storage adapters
 
 Set `YOURE_ALWAYS_ON_MY_MIND_BRIDGE_PATH` to a local executable that accepts a
