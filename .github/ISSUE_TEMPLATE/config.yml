@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/luisroquette/youre-always_on_my_mind-free/security/advisories/new
+    about: Please report security issues privately.

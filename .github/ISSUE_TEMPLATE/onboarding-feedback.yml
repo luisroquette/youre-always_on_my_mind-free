@@ -1,0 +1,47 @@
+name: Onboarding or doctor feedback
+description: Report a local setup result without sharing private data.
+title: "onboarding: "
+labels: ["onboarding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste databases, full chat exports, tokens, credentials, personal paths, or raw doctor logs. Replace them with placeholders.
+  - type: dropdown
+    id: client
+    attributes:
+      label: MCP client
+      options:
+        - Claude Code
+        - Codex
+        - Cursor
+        - Replit
+        - Other compatible client
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows with WSL
+        - Windows native
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Setup and doctor result
+      description: Did npm run setup and npm run doctor pass? Include only redacted errors.
+      placeholder: "setup: passed\ndoctor: failed — [redacted error]"
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question or friction
+      description: What was confusing or what should be automated?
+    validations:
+      required: true
