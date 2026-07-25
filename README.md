@@ -171,6 +171,14 @@ available, and the local doctor outcome. It sends no telemetry from this app.
 For practical workflows and screen-capture scripts, see
 [docs/EXAMPLES.md](docs/EXAMPLES.md) and [docs/VIDEOS.md](docs/VIDEOS.md).
 
+## Help shape the next release
+
+Try the local setup and share a redacted result through the
+[onboarding feedback form](../../issues/new?template=onboarding-feedback.yml).
+For a client export format, use the
+[adapter feedback form](../../issues/new?template=adapter-feedback.yml). Never
+attach real memory databases, chat exports, credentials, or personal paths.
+
 ## What this is not
 
 This is not a hosted memory SaaS, a claude-mem replacement, a competing memory

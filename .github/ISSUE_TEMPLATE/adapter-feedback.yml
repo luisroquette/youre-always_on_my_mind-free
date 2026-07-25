@@ -1,0 +1,36 @@
+name: Adapter format feedback
+description: Propose a stable, local-first client export format.
+title: "adapter: "
+labels: ["adapter"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not attach real chat histories, databases, secrets, or personal paths. Use a synthetic or fully redacted fixture only.
+  - type: input
+    id: client
+    attributes:
+      label: Client and version
+      placeholder: "Example Client 1.2"
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Public format documentation
+      description: Link the official export or format documentation, if available.
+  - type: textarea
+    id: schema
+    attributes:
+      label: Synthetic schema example
+      description: Provide a minimal synthetic sample with no real data.
+      placeholder: '{"project":"demo","summary":"Synthetic outcome"}'
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected importer behavior
+      description: Which project, title, summary, and agent fields should be extracted?
+    validations:
+      required: true
