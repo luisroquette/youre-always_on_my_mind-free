@@ -1,0 +1,28 @@
+{
+  "name": "youre_always_on_my_mind",
+  "version": "0.1.0",
+  "description": "A local-first visual intelligence cockpit for claude-mem and MCP-compatible AI development tools.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dashboard": "node dashboard.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "import:sessions": "node scripts/import-sessions.mjs",
+    "test": "node test/alerts.test.mjs && node test/embeddings.test.mjs && node test/semantic-relations.test.mjs && node test/timeline.test.mjs && node test/persistent-layout.test.mjs && node test/memory-quality.test.mjs && node test/project-memory.test.mjs && node test/cleanup.test.mjs && node test/import-sessions.test.mjs && node test/e2e.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.2.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "three": "^0.185.1",
+    "zod": "^4.3.6"
+  },
+  "overrides": {
+    "adm-zip": "0.6.0",
+    "@hono/node-server": "2.0.11",
+    "sharp": "0.35.3"
+  }
+}

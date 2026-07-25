@@ -1,0 +1,26 @@
+node_modules/
+.DS_Store
+.env
+.env.*
+*.log
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.onnx
+offline-model.json
+gateway-alert-config.json
+gateway-feedback.jsonl
+.claude-mem/
+.cache/
+coverage/
+dist/
+.vercel/
+
+# Private deployment overlays. Keep personal remote access outside public forks.
+launchd/
+scripts/remote-dashboard.sh
+scripts/remote-tunnel.sh
+scripts/deploy-vercel-redirect.mjs
+vercel.json
+test/remote_dashboard_e2e.py

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#030619">
+  <title>You're Always on My Mind</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three.module.js"}}</script>
+</head>
+<body>
+  <main class="app">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">memória local · clientes MCP</p>
+        <h1>You're Always on My Mind</h1>
+      </div>
+      <div class="header-status">
+        <div class="remote-pill" id="remote-pill" hidden><span></span><strong>Remoto · somente leitura</strong></div>
+        <button class="alert-pill" id="alert-pill" data-action="alerts" aria-live="polite"><span></span><strong id="alert-pill-label">Verificando alertas</strong></button>
+        <div class="health-pill" id="health-pill"><span></span><strong>Verificando</strong></div>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="Resumo da memória">
+      <article><span>Memórias</span><strong id="total-observations">—</strong></article>
+      <article><span>Projetos</span><strong id="total-projects">—</strong></article>
+      <article><span>Banco local</span><strong id="database-size">—</strong></article>
+      <article><span>Relações reais</span><strong id="semantic-count">—</strong></article>
+      <article><span>Saturados</span><strong id="saturated-count">—</strong></article>
+      <article><span>Índice semântico</span><strong id="embedding-coverage">—</strong></article>
+    </section>
+
+    <nav class="mode-switcher" aria-label="Organizar rede">
+      <button class="active" data-mode="volume">Volume</button>
+      <button data-mode="activity">Atividade</button>
+      <button data-mode="agent">Claude × Codex</button>
+      <button data-mode="relations">Relações</button>
+      <button data-mode="clusters">Clusters</button>
+      <button data-mode="saturation">Saturação</button>
+      <button data-mode="reinforce">Reforçar</button>
+      <button class="alert-entry" data-action="alerts">Alertas <b id="alert-nav-count">—</b></button>
+      <button data-action="timeline">Linha do tempo</button>
+      <button class="cleanup-entry" data-action="cleanup">Limpeza segura</button>
+    </nav>
+
+    <section class="cluster-toolbar" id="cluster-toolbar" hidden aria-label="Organização automática por clusters">
+      <div class="cluster-axis" role="group" aria-label="Eixo do cluster">
+        <span>AGLUTINAR POR</span>
+        <button class="active" data-cluster-axis="product">Produto</button>
+        <button data-cluster-axis="client">Cliente</button>
+        <button data-cluster-axis="technology">Tecnologia</button>
+        <button data-cluster-axis="agent">Agente</button>
+      </div>
+      <div class="cluster-list" id="cluster-list"></div>
+    </section>
+
+    <section class="alerts-panel" id="alerts-panel" hidden aria-labelledby="alerts-title">
+      <header class="alerts-hero">
+        <div>
+          <p class="eyebrow">Sistema imunológico local</p>
+          <h2 id="alerts-title">Alertas configuráveis</h2>
+          <p>Observe saturação, inatividade e inconsistências com regras transparentes. Nenhum serviço externo é acionado.</p>
+        </div>
+        <button class="quiet-button" data-close-alerts>Voltar à rede</button>
+      </header>
+
+      <div class="alert-summary" aria-label="Resumo dos alertas">
+        <article><span>Ativos</span><strong id="alert-total">—</strong></article>
+        <article><span>Críticos</span><strong id="alert-critical">—</strong></article>
+        <article><span>Avisos</span><strong id="alert-warning">—</strong></article>
+        <article><span>Projetos silenciados</span><strong id="alert-muted">—</strong></article>
+      </div>
+
+      <div class="alert-console">
+        <aside class="alert-rules">
+          <div class="alert-rules-head">
+            <div><p class="eyebrow">Limiares globais</p><h2>Regras de vigilância</h2></div>
+            <label class="master-switch"><input id="alerts-enabled" type="checkbox"><span>Sistema ativo</span></label>
+          </div>
+
+          <article class="alert-rule saturation">
+            <header><i></i><div><strong>Saturação</strong><small>Volume relativo + idade</small></div><label><input id="alert-saturation-enabled" type="checkbox"><span>Ativa</span></label></header>
+            <div class="alert-rule-fields">
+              <label><span>Pressão mínima</span><input id="alert-saturation-threshold" type="number" min="40" max="100"><small>%</small></label>
+              <label><span>Mínimo de memórias</span><input id="alert-saturation-minimum" type="number" min="1" max="100000"></label>
+            </div>
+          </article>
+
+          <article class="alert-rule stale">
+            <header><i></i><div><strong>Desatualização</strong><small>Dias desde a última memória</small></div><label><input id="alert-stale-enabled" type="checkbox"><span>Ativa</span></label></header>
+            <div class="alert-rule-fields">
+              <label><span>Sem atividade</span><input id="alert-stale-days" type="number" min="7" max="3650"><small>dias</small></label>
+              <label><span>Mínimo de memórias</span><input id="alert-stale-minimum" type="number" min="1" max="100000"></label>
+            </div>
+          </article>
+
+          <article class="alert-rule inconsistent">
+            <header><i></i><div><strong>Inconsistência</strong><small>Títulos repetidos, feedback e lacunas</small></div><label><input id="alert-inconsistent-enabled" type="checkbox"><span>Ativa</span></label></header>
+            <div class="alert-rule-fields triple">
+              <label><span>Títulos repetidos</span><input id="alert-duplicate-threshold" type="number" min="1" max="10000"></label>
+              <label><span>Feedback incorreto</span><input id="alert-incorrect-threshold" type="number" min="1" max="10000"></label>
+              <label><span>Títulos ausentes</span><input id="alert-missing-threshold" type="number" min="1" max="10000"></label>
+            </div>
+          </article>
+
+          <div class="alert-config-actions">
+            <button class="quiet-button" id="alert-reset">Restaurar padrões</button>
+            <button class="impact-button" id="alert-save">Salvar regras</button>
+          </div>
+          <p class="alert-save-status" id="alert-save-status" aria-live="polite"></p>
+          <div class="alert-muted-list" id="alert-muted-list" aria-label="Projetos silenciados"></div>
+        </aside>
+
+        <article class="alert-feed">
+          <header>
+            <div><p class="eyebrow">Sinais ativos</p><h2>Projetos que pedem atenção</h2></div>
+            <label><span>Filtrar</span><select id="alert-kind-filter"><option value="all">Todos</option><option value="saturation">Saturação</option><option value="stale">Desatualizados</option><option value="inconsistent">Inconsistentes</option></select></label>
+          </header>
+          <div class="alert-list" id="alert-list" role="list" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="timeline-panel" id="timeline-panel" hidden aria-labelledby="timeline-title">
+      <header class="timeline-hero">
+        <div>
+          <p class="eyebrow">Anéis de crescimento</p>
+          <h2 id="timeline-title">História viva da memória</h2>
+          <p>Crescimento, pressão por projeto e alternância Claude × Codex em uma leitura contínua.</p>
+        </div>
+        <div class="timeline-actions">
+          <div class="range-switcher" role="group" aria-label="Período da linha do tempo">
+            <button data-timeline-range="30">30 dias</button>
+            <button class="active" data-timeline-range="90">90 dias</button>
+            <button data-timeline-range="180">180 dias</button>
+            <button data-timeline-range="all">Tudo</button>
+          </div>
+          <label><span>Agrupar</span><select id="timeline-bucket"><option value="auto">Automático</option><option value="day">Dia</option><option value="week">Semana</option><option value="month">Mês</option></select></label>
+          <button class="quiet-button" data-close-timeline>Voltar à rede</button>
+        </div>
+      </header>
+
+      <div class="timeline-summary" aria-label="Resumo histórico">
+        <article><span>Crescimento</span><strong id="timeline-growth">—</strong><small id="timeline-growth-note"></small></article>
+        <article><span>Saturados agora</span><strong id="timeline-saturated">—</strong><small id="timeline-saturated-note"></small></article>
+        <article><span>Concentração top 3</span><strong id="timeline-concentration">—</strong><small id="timeline-concentration-note"></small></article>
+        <article><span>Participação Codex</span><strong id="timeline-codex">—</strong><small id="timeline-codex-note"></small></article>
+      </div>
+
+      <article class="growth-vessel">
+        <div class="timeline-chart-head">
+          <div><p class="eyebrow">Fluxo acumulado</p><h2>Crescimento da memória</h2></div>
+          <div class="chart-legend"><span><i class="growth-line"></i>Total</span><span><i class="growth-bar"></i>Novas no período</span></div>
+        </div>
+        <div class="timeline-chart" id="growth-chart" role="group" aria-label="Gráfico de crescimento acumulado da memória"></div>
+        <div class="timeline-cursor-card" id="timeline-cursor-card" aria-live="polite"></div>
+      </article>
+
+      <div class="timeline-secondary">
+        <article>
+          <div class="timeline-chart-head">
+            <div><p class="eyebrow">Pressão sistêmica</p><h2>Saturação e concentração</h2></div>
+            <div class="chart-legend"><span><i class="saturation-line"></i>Concentração</span><span><i class="saturation-dot"></i>Projetos saturados</span></div>
+          </div>
+          <div class="timeline-chart compact" id="saturation-chart" role="group" aria-label="Gráfico histórico de saturação"></div>
+        </article>
+        <article>
+          <div class="timeline-chart-head">
+            <div><p class="eyebrow">Coautoria</p><h2>Claude × Codex</h2></div>
+            <div class="chart-legend"><span><i class="legacy-line"></i>Legado</span><span><i class="claude-line"></i>Claude</span><span><i class="codex-line"></i>Codex</span></div>
+          </div>
+          <div class="timeline-chart compact" id="agent-chart" role="group" aria-label="Gráfico histórico da participação Claude, Codex e legado"></div>
+        </article>
+      </div>
+
+      <section class="timeline-events">
+        <div><p class="eyebrow">Pontos de inflexão</p><h2>O que mudou</h2></div>
+        <div class="event-list" id="timeline-event-list"></div>
+      </section>
+    </section>
+
+    <section class="cleanup-panel" id="cleanup-panel" hidden aria-labelledby="cleanup-title">
+      <header class="cleanup-hero">
+        <div>
+          <p class="eyebrow">Câmara de descontaminação</p>
+          <h2 id="cleanup-title">Limpeza segura da memória</h2>
+          <p>Selecione candidatos, simule o espaço recuperável e confirme. Nenhuma memória é apagada automaticamente.</p>
+        </div>
+        <button class="quiet-button" data-close-cleanup>Voltar à rede</button>
+      </header>
+
+      <div class="cleanup-summary" aria-label="Resumo dos candidatos">
+        <article><span>Candidatos</span><strong id="cleanup-total">—</strong></article>
+        <article><span>Recomendados</span><strong id="cleanup-recommended">—</strong></article>
+        <article><span>Projetos afetados</span><strong id="cleanup-projects">—</strong></article>
+        <article><span>Conteúdo estimado</span><strong id="cleanup-bytes">—</strong></article>
+      </div>
+
+      <div class="safety-rail">
+        <span class="safety-lock" aria-hidden="true"></span>
+        <div><strong>Quatro barreiras ativas</strong><p>Candidato válido → prévia → frase exata → quarentena restaurável e auditoria.</p></div>
+      </div>
+
+      <div class="cleanup-controls">
+        <label><span>Projeto</span><select id="cleanup-project-filter"><option value="">Todos</option></select></label>
+        <label><span>Tipo</span><select id="cleanup-kind-filter"><option value="all">Duplicadas + obsoletas</option><option value="duplicate">Duplicadas</option><option value="obsolete">Obsoletas</option></select></label>
+        <label class="cleanup-search"><span>Buscar candidato</span><input id="cleanup-search" type="search" placeholder="Título ou projeto"></label>
+        <button class="quiet-button" id="cleanup-refresh">Reanalisar</button>
+      </div>
+
+      <div class="cleanup-workspace">
+        <article class="candidate-chamber">
+          <div class="candidate-head">
+            <div><span class="eyebrow">Triagem manual</span><h2>Memórias candidatas</h2></div>
+            <div class="candidate-actions">
+              <button class="quiet-button" id="select-recommended">Selecionar recomendações</button>
+              <button class="quiet-button" id="clear-cleanup-selection">Limpar seleção</button>
+            </div>
+          </div>
+          <p class="candidate-note">“Título repetido” indica apenas semelhança e exige revisão humana. Recomendações são conteúdo idêntico ou registros marcados como obsoletos.</p>
+          <div class="candidate-list" id="cleanup-candidate-list" role="list"></div>
+        </article>
+
+        <aside class="impact-chamber" aria-live="polite">
+          <div>
+            <span class="eyebrow">Antes de excluir</span>
+            <h2>Simulador de poda</h2>
+          </div>
+          <div id="cleanup-impact" class="impact-empty">
+            <strong>Nenhuma memória selecionada</strong>
+            <p>Marque os registros que deseja avaliar. A análise ainda não altera o banco.</p>
+          </div>
+          <button class="impact-button" id="preview-cleanup" disabled>Simular poda</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="workspace" id="graph-workspace">
+      <article class="neural-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow" id="mode-kicker">Organização por volume</span>
+            <h2>Rede neural de projetos</h2>
+          </div>
+          <p>Arraste para girar · scroll para zoom · clique para selecionar</p>
+        </div>
+        <div id="scene" aria-label="Rede neural 3D de projetos"></div>
+        <div class="scene-legend">
+          <span class="agent-color-key"><i class="codex"></i>Codex</span>
+          <span class="agent-color-key"><i class="claude"></i>Claude</span>
+          <span class="agent-color-key"><i class="mixed"></i>Misto</span>
+          <span id="cluster-color-key" hidden><i class="cluster-key"></i><span></span></span>
+          <span><b></b>Volume da esfera ∝ memórias</span>
+          <span class="layout-status"><i></i>Layout persistente</span>
+          <span><em class="edge-files"></em>Arquivo</span>
+          <span><em class="edge-topics"></em>Assunto</span>
+          <span><em class="edge-decisions"></em>Decisão</span>
+        </div>
+        <div class="tooltip" id="tooltip" hidden></div>
+      </article>
+
+      <aside class="navigator">
+        <div class="navigator-head">
+          <div>
+            <span class="eyebrow">Navegação precisa</span>
+            <h2>Projetos</h2>
+          </div>
+          <label class="search"><span>Buscar</span><input id="project-search" type="search" placeholder="Nome do projeto"></label>
+        </div>
+        <div class="project-list" id="project-list" role="list"></div>
+      </aside>
+    </section>
+
+    <section class="detail-panel" id="detail-panel" aria-live="polite">
+      <div class="detail-empty">
+        <span class="eyebrow">Seleção</span>
+        <h2>Escolha uma esfera ou projeto</h2>
+        <p>Você verá volume, origem, atividade e sinais de saturação sem poluir a rede.</p>
+      </div>
+    </section>
+
+    <section class="signals" id="signals-panel">
+      <article>
+        <span class="signal-icon saturation"></span>
+        <div><p class="eyebrow">Saturação</p><h2>Memória acumulada</h2><p>Projetos densos que merecem revisão de duplicatas e registros antigos.</p></div>
+        <div class="signal-list" id="saturation-list"></div>
+      </article>
+      <article>
+        <span class="signal-icon reinforce"></span>
+        <div><p class="eyebrow">Reforço</p><h2>Contexto insuficiente</h2><p>Projetos ativos com poucas decisões persistidas.</p></div>
+        <div class="signal-list" id="reinforce-list"></div>
+      </article>
+      <article>
+        <span class="signal-icon review"></span>
+        <div><p class="eyebrow">Revisão</p><h2>Possível poda</h2><p>Projetos antigos e volumosos; nada é apagado automaticamente.</p></div>
+        <div class="signal-list" id="review-list"></div>
+      </article>
+    </section>
+
+    <dialog class="cleanup-dialog" id="cleanup-dialog" aria-labelledby="cleanup-dialog-title">
+      <form method="dialog">
+        <button class="dialog-close" value="cancel" aria-label="Fechar">×</button>
+        <p class="eyebrow">Última barreira</p>
+        <h2 id="cleanup-dialog-title">Confirmar exclusão</h2>
+        <p id="cleanup-dialog-summary"></p>
+        <div class="backup-assurance"><span></span><p><strong>Recuperável por quarentena</strong><br>Uma cópia SQLite dos registros selecionados será criada antes da transação.</p></div>
+        <label class="confirm-label"><span>Digite <b id="cleanup-confirm-phrase"></b></span><input id="cleanup-confirm-input" autocomplete="off" spellcheck="false"></label>
+        <menu>
+          <button class="quiet-button" value="cancel">Cancelar</button>
+          <button class="delete-button" id="execute-cleanup" type="button" disabled>Excluir definitivamente</button>
+        </menu>
+      </form>
+    </dialog>
+  </main>
+  <script type="module" src="/assets/app.js"></script>
+</body>
+</html>

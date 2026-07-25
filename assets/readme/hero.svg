@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">You're Always on My Mind — local memory network</title>
+  <desc id="desc">A stylized local memory dashboard with a neural graph connecting AI coding tools.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071534"/><stop offset=".52" stop-color="#070c26"/><stop offset="1" stop-color="#120b31"/></linearGradient>
+    <radialGradient id="bloom"><stop stop-color="#4ecbff" stop-opacity=".34"/><stop offset="1" stop-color="#4ecbff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="violet"><stop stop-color="#957aff" stop-opacity=".4"/><stop offset="1" stop-color="#957aff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="line" x2="1"><stop stop-color="#4bd0ff"/><stop offset="1" stop-color="#9b79ff"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1600" height="900" rx="34" fill="url(#bg)"/>
+  <circle cx="126" cy="-30" r="330" fill="url(#bloom)" filter="url(#blur)"/>
+  <circle cx="1470" cy="130" r="310" fill="url(#violet)" filter="url(#blur)"/>
+  <g fill="none" stroke="#5e79bc" stroke-opacity=".24"><path d="M72 296H1528"/><path d="M72 424H1528"/><path d="M72 552H1528"/><path d="M72 680H1528"/></g>
+  <text x="84" y="94" fill="#9db2df" font-family="ui-monospace,monospace" font-size="19" font-weight="700" letter-spacing="4">CLAUDE-MEM COMPANION · LOCAL MCP</text>
+  <text x="84" y="168" fill="#f2f5ff" font-family="Georgia,serif" font-size="70" letter-spacing="-3">Your context</text>
+  <text x="84" y="238" fill="#f2f5ff" font-family="Georgia,serif" font-size="70" letter-spacing="-3">doesn't reset.</text>
+  <text x="88" y="278" fill="#9db2df" font-family="Arial,sans-serif" font-size="22">One private memory across the AI tools you build with.</text>
+  <g font-family="ui-monospace,monospace" font-size="16" font-weight="700">
+    <g transform="translate(84 320)"><rect width="178" height="48" rx="24" fill="#122c52" stroke="#48c8ff" stroke-opacity=".6"/><circle cx="27" cy="24" r="7" fill="#48c8ff" filter="url(#glow)"/><text x="48" y="30" fill="#ccecff">CLAUDE CODE</text></g>
+    <g transform="translate(276 320)"><rect width="112" height="48" rx="24" fill="#211b4d" stroke="#9a7aff" stroke-opacity=".65"/><circle cx="27" cy="24" r="7" fill="#9a7aff" filter="url(#glow)"/><text x="48" y="30" fill="#e1d9ff">CODEX</text></g>
+    <g transform="translate(402 320)"><rect width="128" height="48" rx="24" fill="#19284a" stroke="#78dfb9" stroke-opacity=".55"/><circle cx="27" cy="24" r="7" fill="#78dfb9" filter="url(#glow)"/><text x="48" y="30" fill="#d4f6e8">CURSOR</text></g>
+  </g>
+  <g transform="translate(84 420)">
+    <rect width="930" height="396" rx="24" fill="#091434" fill-opacity=".86" stroke="#5674b7" stroke-opacity=".38"/>
+    <text x="34" y="48" fill="#99afd8" font-family="ui-monospace,monospace" font-size="15" font-weight="700" letter-spacing="2">NEURAL MEMORY MAP</text>
+    <text x="34" y="81" fill="#edf2ff" font-family="Georgia,serif" font-size="31">Projects with a shared past</text>
+    <g stroke="url(#line)" stroke-width="2" stroke-opacity=".55"><path d="M188 253L391 155L571 255L765 174"/><path d="M188 253L406 307L571 255L691 333"/><path d="M391 155L406 307L765 174"/><path d="M571 255L765 174"/><path d="M188 253L765 174"/></g>
+    <g filter="url(#glow)"><circle cx="188" cy="253" r="34" fill="#6d7bff"/><circle cx="391" cy="155" r="22" fill="#4ecbff"/><circle cx="406" cy="307" r="48" fill="#846dff"/><circle cx="571" cy="255" r="28" fill="#4ecbff"/><circle cx="691" cy="333" r="17" fill="#aa8cff"/><circle cx="765" cy="174" r="39" fill="#6d7bff"/></g>
+    <g fill="#c8d7fc" font-family="Arial,sans-serif" font-size="15"><text x="126" y="311">decisions</text><text x="348" y="116">architecture</text><text x="355" y="375">product context</text><text x="526" y="304">validated</text><text x="645" y="371">research</text><text x="722" y="232">sessions</text></g>
+    <text x="34" y="358" fill="#7e96c9" font-family="Arial,sans-serif" font-size="15">Search by meaning · reveal relationships · keep only what is useful</text>
+  </g>
+  <g transform="translate(1044 420)">
+    <rect width="472" height="396" rx="24" fill="#0a1432" fill-opacity=".9" stroke="#5674b7" stroke-opacity=".38"/>
+    <text x="30" y="47" fill="#99afd8" font-family="ui-monospace,monospace" font-size="15" font-weight="700" letter-spacing="2">CLAUDE-MEM · ONE CLEAR VIEW</text>
+    <text x="30" y="84" fill="#edf2ff" font-family="Georgia,serif" font-size="29">Make memory actionable.</text>
+    <g transform="translate(30 118)" font-family="Arial,sans-serif"><rect width="412" height="60" rx="13" fill="#102146" stroke="#4ecbff" stroke-opacity=".36"/><circle cx="28" cy="30" r="8" fill="#4ecbff"/><text x="52" y="27" fill="#f0f5ff" font-size="16" font-weight="700">Record</text><text x="52" y="47" fill="#8da5d3" font-size="13">Save a durable decision with context.</text></g>
+    <g transform="translate(30 194)" font-family="Arial,sans-serif"><rect width="412" height="60" rx="13" fill="#17183c" stroke="#9a7aff" stroke-opacity=".42"/><circle cx="28" cy="30" r="8" fill="#9a7aff"/><text x="52" y="27" fill="#f0f5ff" font-size="16" font-weight="700">Retrieve</text><text x="52" y="47" fill="#8da5d3" font-size="13">Find prior work by meaning, not luck.</text></g>
+    <g transform="translate(30 270)" font-family="Arial,sans-serif"><rect width="412" height="60" rx="13" fill="#112943" stroke="#78dfb9" stroke-opacity=".42"/><circle cx="28" cy="30" r="8" fill="#78dfb9"/><text x="52" y="27" fill="#f0f5ff" font-size="16" font-weight="700">Continue</text><text x="52" y="47" fill="#8da5d3" font-size="13">Pick up in another client without reset.</text></g>
+  </g>
+  <text x="84" y="862" fill="#8da5d3" font-family="ui-monospace,monospace" font-size="15">LOCAL-FIRST · OFFLINE SEMANTIC SEARCH · MIT OPEN SOURCE</text>
+</svg>
